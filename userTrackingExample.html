@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Research Proposal Demo By Zhaobo Wang</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #4285F4;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .study-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+
+        .distraction-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            overflow-y: auto;
+        }
+
+        .article {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .questions {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .distraction-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .distraction-item:hover {
+            transform: scale(1.02);
+        }
+
+        .meme-image {
+            width: 100%;
+            height: 150px;
+            background-color: #eee;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #999;
+        }
+
+        .social-post {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .tracking-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+            /* 默认隐藏，可通过开关显示 */
+        }
+
+        button {
+            padding: 8px 15px;
+            background: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+
+        textarea,
+        input[type="radio"] {
+            margin: 5px 0;
+        }
+
+        #tracking-toggle {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 100;
+            background: #333;
+        }
+
+        h2 {
+            color: #4285F4;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #refresh-analysis {
+            background-color: #34A853;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #refresh-analysis:hover {
+            background-color: #2E8B57;
+        }
+
+        /* 添加这些样式到您的style标签内 */
+        #show-analysis {
+            position: fixed;
+            bottom: 10px;
+            right: 80px;
+            /* 放在tracking-toggle按钮旁边 */
+            z-index: 100;
+            background: #4285F4;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* 分析面板样式 */
+        .analysis-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 900px;
+            max-height: 80vh;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Research Proposal Demo By Zhaobo Wang</h1>
+    </header>
+
+    <div class="container">
+        <!-- 学习区域 - 左侧 -->
+        <div class="study-section" id="study-area">
+            <div class="article">
+                <h2>Reading Practice</h2>
+                <h3>The Importance of Focus in Learning</h3>
+                <p>In today's digital age, maintaining focus while studying has become increasingly challenging.
+                    Research shows that the average student is distracted every 3-5 minutes when studying online. These
+                    distractions significantly impact learning outcomes and retention rates.</p>
+                <p>Studies conducted at Stanford University suggest that multitasking reduces productivity by up to 40%.
+                    When students attempt to study while simultaneously engaging with social media or other digital
+                    distractions, their comprehension and recall abilities diminish substantially.</p>
+                <p>Experts recommend implementing the Pomodoro Technique - studying in focused 25-minute blocks followed
+                    by 5-minute breaks. This method has been proven to enhance concentration and information retention.
+                    Additionally, creating a dedicated study environment free from digital temptations can dramatically
+                    improve learning efficiency.</p>
+                <p>However, developing focus is like building a muscle - it requires consistent practice and gradual
+                    improvement. Students who consciously work on extending their attention spans report better academic
+                    performance and reduced stress levels.</p>
+            </div>
+
+            <div class="questions">
+                <h3>Some Questions</h3>
+
+                <div class="question">
+                    <p>1. According to the article, how often is the average student distracted when studying online?
+                    </p>
+                    <div>
+                        <input type="radio" name="q1" id="q1a" value="a"> <label for="q1a">Every 10-15
+                            minutes</label><br>
+                        <input type="radio" name="q1" id="q1b" value="b"> <label for="q1b">Every 3-5 minutes</label><br>
+                        <input type="radio" name="q1" id="q1c" value="c"> <label for="q1c">Every 30 seconds</label><br>
+                        <input type="radio" name="q1" id="q1d" value="d"> <label for="q1d">Once an hour</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p>2. By what percentage does multitasking reduce productivity according to Stanford research?</p>
+                    <div>
+                        <input type="radio" name="q2" id="q2a" value="a"> <label for="q2a">20%</label><br>
+                        <input type="radio" name="q2" id="q2b" value="b"> <label for="q2b">30%</label><br>
+                        <input type="radio" name="q2" id="q2c" value="c"> <label for="q2c">40%</label><br>
+                        <input type="radio" name="q2" id="q2d" value="d"> <label for="q2d">50%</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p>3. What technique does the article recommend for improving focus?</p>
+                    <div>
+                        <input type="radio" name="q3" id="q3a" value="a"> <label for="q3a">The Pomodoro
+                            Technique</label><br>
+                        <input type="radio" name="q3" id="q3b" value="b"> <label for="q3b">The Feynman
+                            Technique</label><br>
+                        <input type="radio" name="q3" id="q3c" value="c"> <label for="q3c">The Cornell
+                            Method</label><br>
+                        <input type="radio" name="q3" id="q3d" value="d"> <label for="q3d">The Flow State Method</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p>4. What does the article compare developing focus to?</p>
+                    <div>
+                        <input type="radio" name="q4" id="q4a" value="a"> <label for="q4a">Learning a
+                            language</label><br>
+                        <input type="radio" name="q4" id="q4b" value="b"> <label for="q4b">Building a muscle</label><br>
+                        <input type="radio" name="q4" id="q4c" value="c"> <label for="q4c">Solving a puzzle</label><br>
+                        <input type="radio" name="q4" id="q4d" value="d"> <label for="q4d">Climbing a mountain</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p>5. Write a short summary (2-3 sentences) of the main ideas in this article:</p>
+                    <textarea id="q5-answer" rows="3" style="width: 100%"></textarea>
+                </div>
+
+                <button id="submit-answers">Submit Answer</button>
+            </div>
+        </div>
+
+        <!-- 分心区域 - 右侧 -->
+        <div class="distraction-section" id="distraction-area">
+            <h2>Hot Post!!!</h2>
+
+            <div class="distraction-item" id="meme-1">
+                <div class="meme-image">
+                    <img src="image_1.jpg" alt="Study meme"
+                        style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <h3>OMG study too much</h3>
+                <p>For Real #student #study #exam</p>
+                <button class="like-button" data-id="meme-1">Thumb Up (128)</button>
+            </div>
+
+            <div class="distraction-item" id="video-1">
+                <div class="meme-image">
+                    <img src="image_1.jpg" alt="Study meme"
+                        style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <h3>Super Cute Kitten Compilation</h3>
+                <p>These adorable kittens will instantly brighten your mood!</p>
+                <button class="watch-button" data-id="video-1">Watch Video</button>
+            </div>
+
+            <div class="distraction-item" id="social-1">
+                <div class="social-post">
+                    <strong>John Smith</strong> · 10 minutes ago
+                    <p>Just got a perfect score on my exam! Finally can relax this semester and plan a vacation! Any
+                        recommendations?</p>
+                </div>
+                <button class="comment-button" data-id="social-1">Comments (42)</button>
+            </div>
+
+            <div class="distraction-item" id="news-1">
+                <h3>Breaking News: New Generation Smartphone Released</h3>
+                <p>With groundbreaking AI features and innovative design, this phone will transform your lifestyle...
+                </p>
+                <button class="read-more-button" data-id="news-1">Read More</button>
+            </div>
+
+            <div class="distraction-item" id="game-1">
+                <div class="meme-image">
+                    <img src="image_1.jpg" alt="Study meme"
+                        style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <h3>Take a Break: Quick Brain Teaser</h3>
+                <p>Just 1 minute to test your reaction time and focus</p>
+                <button class="play-button" data-id="game-1">Play Game</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tracking-panel" id="tracking-log"></div>
+    <button id="tracking-toggle">显示/隐藏跟踪数据</button>
+    <div class="analysis-panel" id="analysis-panel" style="display:none;">
+        <h2>注意力分析</h2>
+        <div class="charts-container">
+            <div class="chart">
+                <h3>注意力状态分析</h3>
+                <canvas id="ai-analysis-chart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>注意力分配</h3>
+                <canvas id="attention-pie-chart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>注意力随时间变化</h3>
+                <canvas id="attention-timeline-chart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>分心事件分析</h3>
+                <canvas id="distraction-events-chart"></canvas>
+            </div>
+        </div>
+        <div class="ai-analysis">
+            <h3>AI 注意力状态分析</h3>
+            <div id="ai-status">
+                <div class="status-indicator"></div>
+                <div class="status-text">正在分析...</div>
+            </div>
+            <div id="ai-recommendations"></div>
+        </div>
+        <div class="button-group">
+            <button id="refresh-analysis">刷新数据</button>
+            <button id="close-analysis">关闭分析</button>
+        </div>
+
+    </div>
+
+    <script>
+        const attentionTracker = {
+            events: [],
+            studyTimeTotal: 0,
+            distractionTimeTotal: 0,
+            lastAreaFocus: null,
+            lastFocusTime: null,
+
+            init: function () {
+                this.sessionId = 'sess_' + Math.random().toString(36).substring(2);
+                this.startTime = new Date();
+                this.lastAreaFocus = 'study-area';
+                this.lastFocusTime = this.startTime;
+
+                setInterval(() => {
+                    this.updateAreaTime();
+                    this.saveDataForAnalysis();
+                }, 60 * 1000);
+
+                this.track('session_start', {
+                    url: window.location.href,
+                    title: document.title
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    this.updateAreaTime();
+                    const duration = (new Date() - this.startTime) / 1000;
+                    this.track('session_end', {
+                        duration: duration,
+                        studyTime: this.studyTimeTotal,
+                        distractionTime: this.distractionTimeTotal,
+                        studyPercentage: (this.studyTimeTotal / duration * 100).toFixed(1) + '%'
+                    });
+                });
+
+                console.log('注意力跟踪已初始化');
+            },
+
+            updateAreaTime: function () {
+                const now = new Date();
+                const timeSpent = (now - this.lastFocusTime) / 1000;
+
+                if (this.lastAreaFocus === 'study-area') {
+                    this.studyTimeTotal += timeSpent;
+                } else if (this.lastAreaFocus === 'distraction-area') {
+                    this.distractionTimeTotal += timeSpent;
+                }
+
+                this.lastFocusTime = now;
+            },
+
+            track: function (eventName, eventData) {
+                const event = {
+                    sessionId: this.sessionId,
+                    eventName: eventName,
+                    eventData: eventData,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.events.push(event);
+                this.logEvent(event);
+
+                // 这里可以添加发送数据到服务器的代码
+            },
+
+            logEvent: function (event) {
+                const logElement = document.getElementById('tracking-log');
+                const logEntry = document.createElement('div');
+                logEntry.textContent = `${new Date().toLocaleTimeString()} - ${event.eventName}: ${JSON.stringify(event.eventData)}`;
+                logElement.appendChild(logEntry);
+                logElement.scrollTop = logElement.scrollHeight;
+            },
+
+            saveDataForAnalysis: function () {
+                // 将数据保存到 localStorage 或发送到服务器
+                const analysisData = {
+                    sessionId: this.sessionId,
+                    events: this.events,
+                    studyTime: this.studyTimeTotal,
+                    distractionTime: this.distractionTimeTotal,
+                    timestamp: new Date().toISOString()
+                };
+
+                // 使用 localStorage 暂存数据
+                const existingData = JSON.parse(localStorage.getItem('attentionData') || '[]');
+                existingData.push(analysisData);
+                localStorage.setItem('attentionData', JSON.stringify(existingData));
+
+                // 或者发送到服务器
+                // fetch('/api/attention-data', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(analysisData)
+                // });
+            }
+
+
+        };
+
+        function visualizeAttentionData() {
+            const data = JSON.parse(localStorage.getItem('attentionData') || '[]');
+            if (data.length === 0) {
+                alert('没有足够的数据进行分析');
+                return;
+            }
+
+            // 获取最新的会话数据
+            const latestSession = data[data.length - 1];
+
+            // 清除现有图表以避免重叠
+            document.querySelectorAll('.chart canvas').forEach(canvas => {
+                canvas.remove();
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = canvas.id;
+                canvas.parentNode.appendChild(newCanvas);
+            });
+
+            // 1. 时间分配柱状图
+            const pieCtx = document.getElementById('attention-pie-chart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['学习时间', '分心时间'],
+                    datasets: [{
+                        label: '时间分配(秒)',
+                        data: [latestSession.studyTime, latestSession.distractionTime],
+                        backgroundColor: ['#4285F4', '#EA4335'],
+                        borderColor: ['#3367d6', '#c5221f'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',  // 水平柱状图
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '最后更新: ' + new Date().toLocaleTimeString()
+                        },
+                        legend: {
+                            display: false  // 隐藏图例，因为标签已经很清晰
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '时间(秒)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. 时间线图表
+            const timelineData = processTimelineData(latestSession.events);
+            const timelineCtx = document.getElementById('attention-timeline-chart').getContext('2d');
+            new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: timelineData.labels,
+                    datasets: [{
+                        label: '学习区域聚焦度',
+                        data: timelineData.studyFocus,
+                        borderColor: '#4285F4',
+                        backgroundColor: 'rgba(66, 133, 244, 0.2)',
+                        fill: true
+                    }, {
+                        label: '分心区域聚焦度',
+                        data: timelineData.distractionFocus,
+                        borderColor: '#EA4335',
+                        backgroundColor: 'rgba(234, 67, 53, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: { display: true, text: '时间（分钟）' }
+                        },
+                        y: {
+                            title: { display: true, text: '聚焦度' },
+                            min: 0,
+                            max: 1
+                        }
+                    }
+                }
+            });
+
+            // 3. 分心事件分析
+            const distractionEvents = countDistractionEvents(latestSession.events);
+            const distractionCtx = document.getElementById('distraction-events-chart').getContext('2d');
+            new Chart(distractionCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(distractionEvents),
+                    datasets: [{
+                        label: '分心事件次数',
+                        data: Object.values(distractionEvents),
+                        backgroundColor: '#FBBC05',
+                        borderColor: '#F9A825',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '事件次数' }
+                        }
+                    }
+                }
+            });
+
+            // 显示分析面板
+            document.getElementById('analysis-panel').style.display = 'block';
+
+            // 调用 AI 分析
+            analyzeAttentionWithAI(latestSession);
+        }
+
+        // 处理时间线数据
+        function processTimelineData(events) {
+            // 这里简化处理，实际应用中需要更复杂的时间序列分析
+            const timeIntervals = 10; // 将会话分成10个时间段
+            const studyFocus = Array(timeIntervals).fill(0);
+            const distractionFocus = Array(timeIntervals).fill(0);
+            const labels = [];
+
+            // 生成时间标签
+            for (let i = 0; i < timeIntervals; i++) {
+                labels.push(`${i * 3}-${(i + 1) * 3}分钟`);
+            }
+
+            // 按时间段统计焦点事件
+            events.forEach(event => {
+                if (event.eventName === 'focus_change') {
+                    const timestamp = new Date(event.timestamp).getTime();
+                    const sessionStart = new Date(events[0].timestamp).getTime();
+                    const timeElapsed = (timestamp - sessionStart) / 1000 / 60; // 分钟
+                    const timeSegment = Math.min(Math.floor(timeElapsed / 3), timeIntervals - 1);
+
+                    if (event.eventData.area === 'study-area') {
+                        studyFocus[timeSegment] += 0.1;
+                    } else if (event.eventData.area === 'distraction-area') {
+                        distractionFocus[timeSegment] += 0.1;
+                    }
+                }
+            });
+
+            // 标准化数据
+            for (let i = 0; i < timeIntervals; i++) {
+                const total = studyFocus[i] + distractionFocus[i];
+                if (total > 0) {
+                    studyFocus[i] = Math.min(studyFocus[i] / total, 1);
+                    distractionFocus[i] = Math.min(distractionFocus[i] / total, 1);
+                }
+            }
+
+            return { labels, studyFocus, distractionFocus };
+        }
+
+        // 统计分心事件
+        function countDistractionEvents(events) {
+            const distractionCounts = {
+                'meme': 0,
+                'video': 0,
+                'social': 0,
+                'news': 0,
+                'game': 0
+            };
+
+            events.forEach(event => {
+                if (event.eventName === 'distraction_click' || event.eventName === 'distraction_action') {
+                    const itemType = event.eventData.itemType ||
+                        (event.eventData.itemId ? event.eventData.itemId.split('-')[0] : 'other');
+                    if (distractionCounts[itemType] !== undefined) {
+                        distractionCounts[itemType]++;
+                    }
+                }
+            });
+
+            return distractionCounts;
+        }
+
+        // AI Analysis Function
+        function analyzeAttentionWithAI(sessionData) {
+            const aiStatus = document.getElementById('ai-status');
+            const aiRecommendations = document.getElementById('ai-recommendations');
+
+            // Calculate key metrics
+            const totalTime = sessionData.studyTime + sessionData.distractionTime;
+            const studyPercentage = totalTime > 0 ? (sessionData.studyTime / totalTime) : 0;
+
+            // Analyze distraction patterns
+            const distractionEvents = countDistractionEvents(sessionData.events);
+            const totalDistractions = Object.values(distractionEvents).reduce((a, b) => a + b, 0);
+
+            // Analyze focus changes over time
+            const timelineData = processTimelineData(sessionData.events);
+            const avgStudyFocus = timelineData.studyFocus.reduce((a, b) => a + b, 0) / timelineData.studyFocus.length;
+            const avgDistractionFocus = timelineData.distractionFocus.reduce((a, b) => a + b, 0) / timelineData.distractionFocus.length;
+
+            // Determine user state
+            let attentionStatus = '';
+            let statusColor = '';
+            let recommendations = [];
+
+            if (studyPercentage >= 0.7) {
+                attentionStatus = 'Highly Focused State';
+                statusColor = '#4CAF50'; // Green
+                recommendations = [
+                    'Your attention performance is excellent!',
+                    'Keep maintaining this focus level',
+                    'Consider taking regular breaks to sustain long-term productivity'
+                ];
+            } else if (studyPercentage >= 0.4) {
+                attentionStatus = 'Moderately Focused State';
+                statusColor = '#FFC107'; // Yellow
+                recommendations = [
+                    'Your focus level is good, but there is room for improvement',
+                    'Try reducing the frequency of checking social media',
+                    'Consider using the Pomodoro Technique to enhance focus'
+                ];
+            } else {
+                attentionStatus = 'Distracted State';
+                statusColor = '#F44336'; // Red
+                recommendations = [
+                    'Your attention is frequently diverted',
+                    'Consider closing or limiting access to distracting content',
+                    'Try setting clear study goals and timeframes',
+                    'Consider using website blockers to limit distracting websites'
+                ];
+            }
+
+            // Analyze the main source of distraction
+            const maxDistractionType = Object.entries(distractionEvents).sort((a, b) => b[1] - a[1])[0];
+            if (maxDistractionType && maxDistractionType[1] > 0) {
+                const distractionTypeMap = {
+                    'meme': 'memes',
+                    'video': 'videos',
+                    'social': 'social media',
+                    'news': 'news content',
+                    'game': 'mini-games'
+                };
+
+                const distractionTypeName = distractionTypeMap[maxDistractionType[0]] || maxDistractionType[0];
+                recommendations.push(`You're most easily distracted by ${distractionTypeName}, consider specifically monitoring your access to this type of content`);
+            }
+
+            // Update AI analysis results
+            aiStatus.innerHTML = `
+                <div class="status-indicator" style="background-color: ${statusColor};"></div>
+                <div class="status-text">
+                    <strong>${attentionStatus}</strong><br>
+                    Study time ratio: ${(studyPercentage * 100).toFixed(1)}%<br>
+                    Total distraction events: ${totalDistractions}
+                </div>
+            `;
+
+            let recommendationsHtml = '<ul>';
+            recommendations.forEach(rec => {
+                recommendationsHtml += `<li>${rec}</li>`;
+            });
+            recommendationsHtml += '</ul>';
+
+            aiRecommendations.innerHTML = `
+                <h4>AI Recommendations</h4>
+                ${recommendationsHtml}
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            attentionTracker.init();
+            // 尝试首次加载可视化
+            setTimeout(function () {
+                visualizeAttentionData();
+            }, 1000); // 给跟踪器一点时间收集数据
+
+            // 刷新分析按钮事件
+            document.getElementById('refresh-analysis').addEventListener('click', function () {
+                // 先更新当前的区域时间
+                attentionTracker.updateAreaTime();
+
+                // 保存最新数据
+                attentionTracker.saveDataForAnalysis();
+
+                // 刷新可视化
+                visualizeAttentionData();
+
+                // 显示刷新提示
+                const refreshMessage = document.createElement('div');
+                refreshMessage.className = 'refresh-message';
+                refreshMessage.textContent = '数据已更新！';
+                refreshMessage.style.cssText = 'position:fixed; top:20px; right:20px; background:#34A853; color:white; padding:10px; border-radius:5px; z-index:1000;';
+                document.body.appendChild(refreshMessage);
+
+                // 3秒后移除提示
+                setTimeout(function () {
+                    refreshMessage.remove();
+                }, 3000);
+            });
+
+            // 关闭分析面板按钮事件
+            document.getElementById('close-analysis').addEventListener('click', function () {
+                document.getElementById('analysis-panel').style.display = 'none';
+            });
+
+            document.querySelectorAll('.study-section, .distraction-section').forEach(section => {
+                section.addEventListener('mouseenter', function () {
+                    attentionTracker.updateAreaTime();
+                    attentionTracker.lastAreaFocus = this.id;
+                    attentionTracker.track('focus_change', {
+                        area: this.id,
+                        from: attentionTracker.lastAreaFocus
+                    });
+                });
+            });
+
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    attentionTracker.track('question_answer', {
+                        questionId: this.name,
+                        answer: this.value
+                    });
+                });
+            });
+
+            document.getElementById('q5-answer').addEventListener('input', function () {
+                attentionTracker.track('text_input', {
+                    fieldId: this.id,
+                    length: this.value.length,
+                    isTyping: true
+                });
+            });
+
+            document.getElementById('q5-answer').addEventListener('blur', function () {
+                attentionTracker.track('text_input_complete', {
+                    fieldId: this.id,
+                    length: this.value.length,
+                    content: this.value.substring(0, 50) + (this.value.length > 50 ? '...' : '')
+                });
+            });
+
+            document.getElementById('submit-answers').addEventListener('click', function () {
+                const answers = {
+                    q1: document.querySelector('input[name="q1"]:checked')?.value || 'unanswered',
+                    q2: document.querySelector('input[name="q2"]:checked')?.value || 'unanswered',
+                    q3: document.querySelector('input[name="q3"]:checked')?.value || 'unanswered',
+                    q4: document.querySelector('input[name="q4"]:checked')?.value || 'unanswered',
+                    q5: document.getElementById('q5-answer').value
+                };
+
+                attentionTracker.track('answers_submitted', {
+                    answers: answers,
+                    completionRate: Object.values(answers).filter(a => a && a !== 'unanswered').length / 5 * 100 + '%'
+                });
+
+                alert('Submitted！');
+            });
+
+            document.querySelectorAll('.distraction-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    attentionTracker.track('distraction_click', {
+                        itemId: this.id,
+                        itemType: this.id.split('-')[0],
+                        title: this.querySelector('h3').textContent
+                    });
+                });
+            });
+
+            document.querySelectorAll('.like-button, .watch-button, .comment-button, .read-more-button, .play-button').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    attentionTracker.track('distraction_action', {
+                        action: this.className.replace('-button', ''),
+                        itemId: this.getAttribute('data-id')
+                    });
+
+                    if (this.className.includes('like-button')) {
+                        const currentLikes = parseInt(this.textContent.match(/\d+/)[0]);
+                        this.textContent = `Thumb Up (${currentLikes + 1})`;
+                    } else if (this.className.includes('play-button')) {
+                        alert('Game Loading...');
+                    } else if (this.className.includes('watch-button')) {
+                        alert('Video Loading...');
+                    } else if (this.className.includes('comment-button')) {
+                        const commentBox = document.createElement('div');
+                        commentBox.innerHTML = '<input type="text" placeholder="Write a comment..." style="width:80%"><button style="margin-left:5px">发送</button>';
+                        this.parentNode.appendChild(commentBox);
+                        this.style.display = 'none';
+                    }
+                });
+            });
+
+            let lastScrollTime = Date.now();
+            document.addEventListener('scroll', function () {
+                if (Date.now() - lastScrollTime > 1000) {
+                    lastScrollTime = Date.now();
+                    attentionTracker.track('page_scroll', {
+                        position: window.scrollY,
+                        area: document.elementFromPoint(100, 100)?.closest('.study-section, .distraction-section')?.id
+                    });
+                }
+            });
+
+            document.getElementById('tracking-toggle').addEventListener('click', function () {
+                const trackingLog = document.getElementById('tracking-log');
+                trackingLog.style.display = trackingLog.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // 确保按钮存在
+            const showAnalysisBtn = document.getElementById('show-analysis');
+            if (showAnalysisBtn) {
+                console.log('Show analysis button found');
+                showAnalysisBtn.addEventListener('click', function () {
+                    console.log('Show analysis button clicked');
+                    visualizeAttentionData();
+                });
+            } else {
+                console.error('Show analysis button not found!');
+            }
+
+            setInterval(function () {
+                attentionTracker.updateAreaTime();
+                const totalTime = attentionTracker.studyTimeTotal + attentionTracker.distractionTimeTotal;
+                if (totalTime > 0) {
+                    attentionTracker.track('attention_stats', {
+                        studyTimeSeconds: Math.round(attentionTracker.studyTimeTotal),
+                        distractionTimeSeconds: Math.round(attentionTracker.distractionTimeTotal),
+                        studyPercentage: (attentionTracker.studyTimeTotal / totalTime * 100).toFixed(1) + '%',
+                        currentFocus: attentionTracker.lastAreaFocus
+                    });
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+
+</html>
